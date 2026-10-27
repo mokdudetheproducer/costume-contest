@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Costume Contest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0a14; --bg2:#171126; --card:#1f1733; --card2:#271d40; --line:#3a2d58;
+  --text:#f4eefc; --muted:#a99cc4; --orange:#ff7a1a; --orange2:#ffb347;
+  --purple:#9b5cff; --purple2:#c4a1ff; --green:#7dff6a; --red:#ff4d6d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{
+  background:radial-gradient(1200px 700px at 50% -15%,#2c1848 0%,transparent 65%),
+             radial-gradient(800px 500px at 100% 110%,#2a1306 0%,transparent 60%),var(--bg);
+  background-attachment:fixed;
+  color:var(--text);font-family:'Rubik',system-ui,-apple-system,Segoe UI,sans-serif;
+  -webkit-font-smoothing:antialiased;line-height:1.4;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,textarea{font:inherit;color:inherit}
+.display{font-family:'Creepster','Rubik',cursive;font-weight:400;letter-spacing:.04em}
+.muted{color:var(--muted)}
+
+/* ---------- header ---------- */
+header.top{
+  position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:12px 24px;background:rgba(13,10,20,.86);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.brand{font-size:clamp(28px,3.6vw,44px);color:var(--orange);line-height:1;
+  text-shadow:0 0 20px rgba(255,122,26,.5);white-space:nowrap}
+.stats{color:var(--muted);font-size:15px}
+.stats b{color:var(--text)}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:700;margin-left:4px}
+.pill.open{background:rgba(125,255,106,.15);color:var(--green)}
+.pill.closed{background:rgba(255,77,109,.15);color:#ff8fa3}
+.spacer{flex:1}
+.hdr-actions{display:flex;gap:10px}
+.icon-btn{width:46px;height:46px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+  font-size:20px;display:grid;place-items:center;color:var(--muted)}
+.icon-btn:hover{color:var(--text);border-color:var(--purple)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:14px;
+  font-weight:700;font-size:18px;transition:transform .12s,filter .15s,opacity .15s;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#1d0e00;box-shadow:0 6px 24px rgba(255,122,26,.35)}
+.btn-purple{background:linear-gradient(180deg,var(--purple2),var(--purple));color:#13062a;box-shadow:0 6px 24px rgba(155,92,255,.35)}
+.btn-ghost{background:var(--card);border:1px solid var(--line)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:8px 14px;font-size:14px;border-radius:10px}
+.btn-big{padding:18px 34px;font-size:22px;border-radius:18px}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.38;pointer-events:none;box-shadow:none}
+
+/* ---------- screens ---------- */
+main{padding:24px 24px 40px}
+.screen{display:none}
+.screen.active{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gal-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin:4px 0 20px}
+.gal-head h1{font-size:clamp(34px,4vw,52px);color:var(--purple2);line-height:1}
+.gal-head p{color:var(--muted)}
+
+/* ---------- cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}
+.card{position:relative;display:block;width:100%;border-radius:16px;overflow:hidden;background:var(--card);
+  border:2px solid var(--line);text-align:left;transition:transform .15s,border-color .15s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);border-color:var(--purple)}
+.card img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#000}
+.card .num{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.68);padding:3px 10px;border-radius:999px;font-weight:700;font-size:14px}
+.card .cap{display:block;padding:10px 12px 12px}
+.card .cap b{display:block;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .cap span{display:block;color:var(--muted);font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:18px}
+.card .check{position:absolute;top:10px;right:10px;width:42px;height:42px;border-radius:50%;
+  background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.65);display:grid;place-items:center;font-size:22px;font-weight:800}
+.card.selected{border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,122,26,.35),0 0 30px rgba(255,122,26,.45)}
+.card.selected .check{background:var(--orange);border-color:var(--orange);color:#1d0e00}
+.card.mine{opacity:.4;pointer-events:none}
+.card.mine .check{width:auto;padding:0 10px;border-radius:999px;font-size:13px}
+.card.flash{animation:glow 1.2s ease 3}
+@keyframes glow{50%{border-color:var(--orange);box-shadow:0 0 36px rgba(255,122,26,.75)}}
+.card.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.empty{text-align:center;padding:70px 20px;border:2px dashed var(--line);border-radius:24px;max-width:700px;margin:30px auto}
+.empty .big{font-size:80px;line-height:1;margin-bottom:12px}
+.empty h2{font-size:40px;color:var(--orange);margin-bottom:8px}
+.empty p{color:var(--muted);margin-bottom:24px;font-size:18px}
+
+/* ---------- enter screen ---------- */
+.enter-wrap{display:grid;grid-template-columns:auto minmax(320px,440px);gap:32px;justify-content:center;align-items:start}
+@media(max-width:900px){.enter-wrap{grid-template-columns:1fr}}
+.stage{position:relative;aspect-ratio:4/5;width:min(100%,calc((100vh - 200px)*.8));min-width:280px;margin:0 auto;
+  border-radius:22px;overflow:hidden;background:#000;border:2px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.stage video,.stage #shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.stage video{transform:scaleX(-1)}
+.frame-guide{position:absolute;inset:14px;border:2px dashed rgba(255,255,255,.18);border-radius:14px;pointer-events:none}
+.countdown{position:absolute;inset:0;display:grid;place-items:center;font-size:min(40vh,240px);color:var(--orange);
+  text-shadow:0 0 40px rgba(0,0,0,.9),0 0 30px rgba(255,122,26,.8);pointer-events:none}
+.countdown.pop{animation:pop .9s ease}
+@keyframes pop{0%{transform:scale(1.6);opacity:0}25%{transform:scale(1);opacity:1}100%{transform:scale(.8);opacity:.2}}
+.flashfx{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.flashfx.go{animation:flashfx .6s ease}
+@keyframes flashfx{0%{opacity:.95}100%{opacity:0}}
+.cam-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:30px;background:var(--bg2)}
+.cam-msg p:first-child{font-size:22px;font-weight:700}
+.stage-actions{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+.link-btn{color:var(--muted);text-decoration:underline;cursor:pointer;font-size:15px}
+.link-btn:hover{color:var(--text)}
+
+.panel{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:22px;padding:26px}
+.panel h2{font-size:38px;color:var(--orange);line-height:1.05;margin-bottom:12px}
+.steps{margin:0 0 20px 20px;color:var(--muted)}
+.steps li{margin:3px 0}
+.steps li.done{color:var(--green)}
+.field{display:block;margin-bottom:16px}
+.field>span{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px}
+.field em{color:var(--orange);font-style:normal}
+.field small{color:var(--muted);font-weight:400}
+.field input,.field textarea{width:100%;padding:14px 16px;border-radius:12px;background:#0f0b1a;border:2px solid var(--line);font-size:19px;outline:none;resize:none}
+.field input:focus,.field textarea:focus{border-color:var(--purple)}
+.hint{color:var(--muted);font-size:14px;margin-top:10px;text-align:center}
+.err{color:#ff8fa3;min-height:20px;margin:-6px 0 12px;font-size:15px}
+
+/* ---------- vote ---------- */
+.center-card{max-width:520px;margin:6vh auto 0}
+.center-card p{color:var(--muted);margin-bottom:18px;font-size:17px}
+.center-card p b{color:var(--text)}
+#screen-vote{padding-bottom:110px}
+.votebar{position:fixed;left:0;right:0;bottom:0;z-index:25;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 24px;background:rgba(23,17,38,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -10px 40px rgba(0,0,0,.4)}
+.vb-who{color:var(--muted);font-size:14px}
+.vb-who b{color:var(--text)}
+.vb-dots{display:flex;align-items:center;gap:6px;font-size:28px;margin-top:2px}
+.vb-dots .off{filter:grayscale(1) brightness(.5);opacity:.5}
+.vb-dots .lbl{font-size:16px;font-weight:700;margin-left:8px}
+
+/* ---------- modals ---------- */
+.modal-back{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(5,3,10,.78);backdrop-filter:blur(6px)}
+.modal-back.open{display:flex;animation:fadein .2s}
+.modal{position:relative;width:100%;max-width:560px;max-height:calc(100vh - 48px);overflow:auto;background:var(--bg2);border:1px solid var(--line);border-radius:22px;padding:26px}
+.modal.wide{max-width:980px}
+.modal h2{font-size:34px;color:var(--orange);line-height:1.05;margin-bottom:12px}
+.modal .x{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;background:var(--card);font-size:20px;color:var(--muted)}
+.modal .x:hover{color:var(--text)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end;margin-top:18px}
+
+.detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:center}
+.detail img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:16px;background:#000}
+.detail .tag{color:var(--muted);font-weight:700}
+.detail h3{font-size:30px;margin:4px 0 10px;line-height:1.1}
+.detail p{font-size:18px;color:#dcd2ee;white-space:pre-wrap}
+@media(max-width:700px){.detail{grid-template-columns:1fr}}
+#detail-modal .modal{max-width:860px}
+
+.picklist{list-style:none;display:grid;gap:8px;margin:12px 0}
+.picklist li{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:12px;padding:8px}
+.picklist img{width:48px;height:60px;object-fit:cover;border-radius:8px}
+
+/* host */
+.host-sec{border-top:1px solid var(--line);padding-top:18px;margin-top:18px}
+.host-sec h3{font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple2);margin-bottom:12px}
+.toggle{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border-radius:12px;border:1px solid var(--line);cursor:pointer;user-select:none}
+.toggle input{display:none}
+.toggle .sw{width:46px;height:26px;border-radius:999px;background:#3a3150;position:relative;transition:background .2s;flex:none}
+.toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle input:checked+.sw{background:var(--green)}
+.toggle input:checked+.sw::after{transform:translateX(20px)}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{padding:9px 14px;font-weight:700;font-size:14px;color:var(--muted)}
+.seg button.on{background:var(--purple);color:#13062a}
+.note{color:var(--muted);font-size:14px;margin-top:8px}
+table.res{width:100%;border-collapse:collapse}
+table.res td,table.res th{padding:8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+table.res th{color:var(--muted);font-size:13px;font-weight:500}
+table.res img{width:40px;height:50px;object-fit:cover;border-radius:6px;display:block}
+table.res .place{font-weight:800;font-size:18px;width:52px}
+table.res .votes{font-weight:800;font-size:18px;color:var(--orange)}
+.bar{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--orange),var(--orange2));min-width:2px}
+.mini-input{padding:9px 12px;border-radius:10px;background:#0f0b1a;border:1px solid var(--line);font-size:16px;width:140px}
+
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;
+  background:radial-gradient(900px 600px at 50% 40%,#3a1a5c 0%,#0d0a14 70%);cursor:pointer;overflow:hidden}
+.overlay h1{font-size:clamp(48px,8vw,110px);color:var(--orange);line-height:1;text-shadow:0 0 40px rgba(255,122,26,.6)}
+.overlay .sub{font-size:clamp(18px,2.4vw,28px);color:var(--muted);margin-top:16px}
+.overlay .tap{position:absolute;bottom:26px;color:var(--muted);font-size:15px;animation:breathe 2s infinite}
+@keyframes breathe{50%{opacity:.35}}
+.winners{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.winner{width:min(300px,38vw);animation:rise .7s cubic-bezier(.2,.9,.3,1.2) both}
+.winner img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:20px;border:4px solid var(--orange);box-shadow:0 0 60px rgba(255,122,26,.5)}
+.winner b{display:block;font-size:clamp(22px,2.6vw,34px);margin-top:12px}
+.winner span{color:var(--muted);font-size:18px}
+@keyframes rise{from{transform:translateY(60px) scale(.8);opacity:0}to{transform:none;opacity:1}}
+.boo{position:absolute;top:-60px;font-size:42px;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(calc(100vh + 120px)) rotate(540deg)}}
+
+.toast{position:fixed;left:50%;bottom:28px;z-index:90;transform:translateX(-50%) translateY(30px);opacity:0;pointer-events:none;
+  background:#2a2045;border:1px solid var(--purple);color:var(--text);padding:14px 22px;border-radius:14px;font-weight:500;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);transition:all .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.bad{border-color:var(--red)}
+#screen-vote .toast{bottom:110px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand display">🎃 Costume Contest</div>
+  <div class="stats" id="stats"></div>
+  <div class="spacer"></div>
+  <div class="hdr-actions" id="hdr-gallery">
+    <button class="btn btn-primary" id="b-enter">📸 Enter the contest</button>
+    <button class="btn btn-purple" id="b-vote">🗳️ Vote</button>
+  </div>
+  <div class="hdr-actions" id="hdr-back" hidden>
+    <button class="btn btn-ghost" id="b-back">← Back to gallery</button>
+  </div>
+  <button class="icon-btn" id="b-full" title="Full screen">⛶</button>
+  <button class="icon-btn" id="b-host" title="Host controls">⚙︎</button>
+</header>
+
+<main>
+  <!-- GALLERY (main screen) -->
+  <section class="screen" id="screen-gallery">
+    <div class="gal-head" id="gal-head">
+      <h1 class="display">The Lineup</h1>
+      <p>Tap any costume to see it up close.</p>
+    </div>
+    <div class="grid" id="gallery-grid"></div>
+    <div class="empty" id="gallery-empty" hidden>
+      <div class="big">👻</div>
+      <h2 class="display">No costumes yet!</h2>
+      <p>Be the first to strike a pose and enter.</p>
+      <button class="btn btn-primary btn-big" id="b-enter-empty">📸 Enter the contest</button>
+    </div>
+  </section>
+
+  <!-- ENTER -->
+  <section class="screen" id="screen-enter">
+    <div class="enter-wrap">
+      <div>
+        <div class="stage">
+          <video id="video" playsinline muted autoplay></video>
+          <img id="shot" alt="Your photo" hidden>
+          <div class="frame-guide"></div>
+          <div class="countdown display" id="countdown"></div>
+          <div class="flashfx" id="flashfx"></div>
+          <div class="cam-msg" id="cam-msg" hidden>
+            <p>📷 Camera not available</p>
+            <p class="muted">Allow camera access in the browser's address bar, or upload a photo instead.</p>
+            <button class="btn btn-ghost btn-sm" id="b-retry-cam">Try the camera again</button>
+          </div>
+        </div>
+        <div class="stage-actions">
+          <button class="btn btn-primary btn-big" id="b-snap">📸 Take my photo</button>
+          <button class="btn btn-ghost btn-big" id="b-retake" hidden>↺ Retake</button>
+          <label class="link-btn">or upload a photo<input type="file" accept="image/*" id="f-upload" hidden></label>
+        </div>
+      </div>
+
+      <form class="panel" id="enter-form" autocomplete="off">
+        <h2 class="display">Enter the contest</h2>
+        <ol class="steps">
+          <li id="st-1">Strike a pose &amp; snap your photo</li>
+          <li id="st-2">Add your name</li>
+          <li id="st-3">Tell everyone about your costume (optional)</li>
+        </ol>
+        <label class="field"><span>Your name <em>*</em></span>
+          <input id="f-name" maxlength="40" placeholder="First &amp; last, or group name" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="field"><span>Costume blurb <small id="blurb-count">0/160</small></span>
+          <textarea id="f-blurb" maxlength="160" rows="3" placeholder="Who or what are you? Homemade? How long did it take?"></textarea>
+        </label>
+        <button class="btn btn-primary btn-big btn-block" id="b-submit" type="submit" disabled>🎃 Submit my entry</button>
+        <p class="hint" id="enter-hint">Take a photo and add your name to submit.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- VOTE -->
+  <section class="screen" id="screen-vote">
+    <div id="vote-step1" class="center-card panel">
+      <h2 class="display">Time to vote!</h2>
+      <p>Enter your name so we know you've voted. You get <b id="v-k">3</b> votes to give to your favorite costumes — one vote per costume, and you can't vote for yourself.</p>
+      <form id="voter-form" autocomplete="off">
+        <label class="field"><span>Your name</span>
+          <input id="v-name" maxlength="40" placeholder="Your name" autocomplete="off" spellcheck="false">
+        </label>
+        <p class="err" id="v-err"></p>
+        <button class="btn btn-purple btn-big btn-block" type="submit">Start voting →</button>
+      </form>
+    </div>
+    <div id="vote-step2" hidden>
+      <div class="gal-head">
+        <h1 class="display">Pick your favorites</h1>
+        <p>Tap to choose, tap again to undo.</p>
+      </div>
+      <div class="grid" id="vote-grid"></div>
+    </div>
+    <div class="votebar" id="votebar" hidden>
+      <div>
+        <div class="vb-who">Voting as <b id="vb-name"></b></div>
+        <div class="vb-dots" id="vb-dots"></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="b-vote-cancel">Cancel</button>
+      <button class="btn btn-primary btn-big" id="b-vote-submit" disabled>Cast my votes</button>
+    </div>
+  </section>
+</main>
+
+<!-- costume detail -->
+<div class="modal-back" id="detail-modal">
+  <div class="modal"><button class="x" data-close>✕</button><div id="detail-body"></div></div>
+</div>
+
+<!-- confirm votes -->
+<div class="modal-back" id="confirm-modal">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <h2 class="display">Lock in your votes?</h2>
+    <p class="muted">Once you cast them, they're final.</p>
+    <ul class="picklist" id="confirm-list"></ul>
+    <div class="row end">
+      <button class="btn btn-ghost" data-close>Go back</button>
+      <button class="btn btn-primary" id="b-cast">🗳️ Cast my votes</button>
+    </div>
+  </div>
+</div>
+
+<!-- host PIN -->
+<div class="modal-back" id="pin-modal">
+  <div class="modal" style="max-width:400px">
+    <button class="x" data-close>✕</button>
+    <h2 class="display">Host only</h2>
+    <form id="pin-form">
+      <label class="field"><span>Host PIN</span>
+        <input id="pin-input" type="password" inputmode="numeric" autocomplete="off" placeholder="••••">
+      </label>
+      <p class="err" id="pin-err"></p>
+      <button class="btn btn-purple btn-block" type="submit">Unlock</button>
+    </form>
+  </div>
+</div>
+
+<!-- host panel -->
+<div class="modal-back" id="host-modal">
+  <div class="modal wide"><button class="x" data-close>✕</button><div id="host-body"></div></div>
+</div>
+<input type="file" id="import-file" accept="application/json,.json" hidden>
+
+<!-- celebration + reveal overlays -->
+<div class="overlay" id="celebrate" hidden>
+  <div style="font-size:90px">🎃</div>
+  <h1 class="display" id="cel-title"></h1>
+  <div class="sub" id="cel-sub"></div>
+</div>
+<div class="overlay" id="reveal" hidden><div id="reveal-body"></div><div class="tap">click or press space to continue · esc to exit</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   Halloween Costume Contest — single-file kiosk app
+   Data lives in this browser (IndexedDB). Use Host ⚙︎ → Export backup.
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const IDLE_MS = 120000; // kiosk returns to the gallery after 2 min of no activity
+
+/* ---------- settings ---------- */
+const SKEY = 'costumeContest.settings.v1';
+const DEFAULTS = { pin: '1031', entriesOpen: true, votingOpen: false, voteOverride: 0 };
+let settings = Object.assign({}, DEFAULTS, (() => { try { return JSON.parse(localStorage.getItem(SKEY)) || {}; } catch (e) { return {}; } })());
+function saveSettings() { try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch (e) {} }
+
+/* ---------- storage (IndexedDB, with in-memory fallback) ---------- */
+const DB = {
+  db: null, mem: { entries: new Map(), votes: new Map() },
+  async open() {
+    try {
+      this.db = await new Promise((res, rej) => {
+        const r = indexedDB.open('costume-contest', 1);
+        r.onupgradeneeded = () => {
+          const d = r.result;
+          if (!d.objectStoreNames.contains('entries')) d.createObjectStore('entries', { keyPath: 'id' });
+          if (!d.objectStoreNames.contains('votes')) d.createObjectStore('votes', { keyPath: 'id' });
+        };
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+    } catch (e) {
+      this.db = null;
+      toast('⚠️ Browser storage unavailable — entries will be lost on refresh.', true, 8000);
+    }
+  },
+  tx(store, mode, fn) {
+    return new Promise((res, rej) => {
+      const t = this.db.transaction(store, mode);
+      const req = fn(t.objectStore(store));
+      t.oncomplete = () => res(req && req.result);
+      t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+    });
+  },
+  all(s)    { return this.db ? this.tx(s, 'readonly', st => st.getAll()) : Promise.resolve([...this.mem[s].values()]); },
+  put(s, o) { if (!this.db) { this.mem[s].set(o.id, o); return Promise.resolve(); } return this.tx(s, 'readwrite', st => st.put(o)); },
+  del(s, id){ if (!this.db) { this.mem[s].delete(id); return Promise.resolve(); } return this.tx(s, 'readwrite', st => st.delete(id)); },
+  clear(s)  { if (!this.db) { this.mem[s].clear(); return Promise.resolve(); } return this.tx(s, 'readwrite', st => st.clear()); }
+};
+
+let entries = [], votes = [];
+async function load() {
+  entries = (await DB.all('entries')).sort((a, b) => a.num - b.num);
+  votes = await DB.all('votes');
+}
+
+/* ---------- rules ---------- */
+// 3 votes for up to 8 entries, 4 for 9–14, 5 for 15+ (host can force a number)
+function autoVotes(n) { return n <= 8 ? 3 : n <= 14 ? 4 : 5; }
+function votesAllowed() {
+  const n = entries.length;
+  const base = settings.voteOverride || autoVotes(n);
+  return Math.max(1, Math.min(base, Math.max(1, n - 1)));
+}
+function tally() {
+  const c = Object.fromEntries(entries.map(e => [e.id, 0]));
+  votes.forEach(v => v.picks.forEach(id => { if (id in c) c[id]++; }));
+  return c;
+}
+function ranked() {
+  const c = tally();
+  const list = entries.map(e => ({ ...e, votes: c[e.id] })).sort((a, b) => b.votes - a.votes || a.num - b.num);
+  list.forEach(x => x.place = 1 + list.filter(y => y.votes > x.votes).length);
+  return list;
+}
+
+/* ---------- ui helpers ---------- */
+let toastT;
+function toast(msg, bad = false, ms = 3200) {
+  const t = $('#toast');
+  t.textContent = msg; t.classList.toggle('bad', bad); t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms);
+}
+function openModal(id) { $('#' + id).classList.add('open'); }
+function closeModal(id) { $('#' + id).classList.remove('open'); }
+function closeAllModals() { $$('.modal-back.open').forEach(m => m.classList.remove('open')); }
+$$('.modal-back').forEach(m => m.addEventListener('click', e => {
+  if (e.target === m || e.target.closest('[data-close]')) m.classList.remove('open');
+}));
+
+let current = 'gallery';
+function show(name) {
+  // camera stays on between guests so the browser only asks for permission once
+  current = name;
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
+  $('#hdr-gallery').hidden = name !== 'gallery';
+  $('#hdr-back').hidden = name === 'gallery';
+  window.scrollTo(0, 0);
+  updateHeader(); resetIdle();
+}
+function updateHeader() {
+  const n = entries.length, k = votesAllowed();
+  $('#stats').innerHTML =
+    `<b>${n}</b> contestant${n === 1 ? '' : 's'} · <b>${k}</b> vote${k === 1 ? '' : 's'} per guest · ` +
+    `Entries <span class="pill ${settings.entriesOpen ? 'open' : 'closed'}">${settings.entriesOpen ? 'open' : 'closed'}</span> ` +
+    `Voting <span class="pill ${settings.votingOpen ? 'open' : 'closed'}">${settings.votingOpen ? 'open' : 'not yet'}</span>`;
+}
+function cardHTML(e, opts = {}) {
+  const sel = opts.selectable;
+  return `<button class="card${opts.mine ? ' mine' : ''}${opts.selected ? ' selected' : ''}" data-id="${e.id}" type="button">
+    <img src="${e.photo}" alt="${esc(e.name)}" loading="lazy">
+    <span class="num">#${e.num}</span>
+    ${sel ? `<span class="check">${opts.mine ? "that's you" : opts.selected ? '✓' : ''}</span>` : ''}
+    <span class="cap"><b>${esc(e.name)}</b><span>${esc(e.blurb || '')}</span></span>
+  </button>`;
+}
+
+/* ---------- gallery ---------- */
+function renderGallery() {
+  const empty = !entries.length;
+  $('#gallery-empty').hidden = !empty;
+  $('#gal-head').hidden = empty;
+  $('#gallery-grid').innerHTML = entries.map(e => cardHTML(e)).join('');
+  updateHeader();
+}
+$('#gallery-grid').addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c) return;
+  const en = entries.find(x => x.id === c.dataset.id); if (!en) return;
+  $('#detail-body').innerHTML = `<div class="detail">
+    <img src="${en.photo}" alt="${esc(en.name)}">
+    <div><div class="tag">COSTUME #${en.num}</div><h3>${esc(en.name)}</h3>
+    <p>${en.blurb ? esc(en.blurb) : '<span class="muted">No blurb — the costume speaks for itself.</span>'}</p></div></div>`;
+  openModal('detail-modal');
+});
+function flashCard(id) {
+  const c = $(`#gallery-grid .card[data-id="${id}"]`);
+  if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'center' }); c.classList.add('flash'); setTimeout(() => c.classList.remove('flash'), 4000); }
+}
+
+/* ---------- enter: camera ---------- */
+let stream = null, shotData = null, counting = false;
+async function openEnter() {
+  if (!settings.entriesOpen) return toast('Entries are closed — it\'s voting time! 🗳️');
+  resetEnter(); show('enter'); await startCamera();
+}
+function setStage(mode) { // live | shot | nocam
+  $('#shot').hidden = mode !== 'shot';
+  $('#video').hidden = mode !== 'live';
+  $('#cam-msg').hidden = mode !== 'nocam';
+  $('#b-snap').hidden = mode !== 'live';
+  $('#b-retake').hidden = mode !== 'shot';
+}
+function resetEnter() {
+  shotData = null; $('#shot').removeAttribute('src');
+  $('#f-name').value = ''; $('#f-blurb').value = ''; $('#f-upload').value = '';
+  $('#countdown').textContent = '';
+  setStage(stream ? 'live' : 'nocam'); validateEnter();
+}
+async function startCamera() {
+  if (stream && stream.active) { $('#video').play().catch(() => {}); setStage(shotData ? 'shot' : 'live'); return; }
+  stream = null;
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) throw new Error('no camera api');
+    stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode: 'user' }, audio: false });
+    const v = $('#video'); v.srcObject = stream; await v.play().catch(() => {});
+    if (!shotData) setStage('live');
+  } catch (e) {
+    stream = null; if (!shotData) setStage('nocam');
+  }
+}
+function stopCamera() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  $('#video').srcObject = null;
+}
+// center-crop any source to a 4:5 portrait JPEG
+function cropToDataURL(src, w0, h0, mirror) {
+  const R = 0.8; let sw, sh;
+  if (w0 / h0 > R) { sh = h0; sw = h0 * R; } else { sw = w0; sh = w0 / R; }
+  const sx = (w0 - sw) / 2, sy = (h0 - sh) / 2;
+  const H = Math.round(Math.min(1100, sh)), W = Math.round(H * R);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  if (mirror) { g.translate(W, 0); g.scale(-1, 1); }
+  g.drawImage(src, sx, sy, sw, sh, 0, 0, W, H);
+  return c.toDataURL('image/jpeg', 0.85);
+}
+async function snap() {
+  if (counting || !stream) return;
+  const v = $('#video');
+  if (!v.videoWidth) return toast('Camera is still warming up — try again in a sec.');
+  counting = true; $('#b-snap').disabled = true;
+  const cd = $('#countdown');
+  for (const n of [3, 2, 1]) {
+    cd.textContent = n; cd.classList.remove('pop'); void cd.offsetWidth; cd.classList.add('pop');
+    await sleep(900);
+    if (current !== 'enter' || !stream) { cd.textContent = ''; counting = false; $('#b-snap').disabled = false; return; }
+  }
+  cd.textContent = '';
+  const f = $('#flashfx'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+  shotData = cropToDataURL(v, v.videoWidth, v.videoHeight, true); // mirrored, matches the preview
+  $('#shot').src = shotData; setStage('shot');
+  counting = false; $('#b-snap').disabled = false;
+  validateEnter();
+  if (!$('#f-name').value.trim()) $('#f-name').focus();
+}
+function retake() { shotData = null; $('#shot').removeAttribute('src'); validateEnter(); stream ? setStage('live') : startCamera(); }
+$('#b-snap').onclick = snap;
+$('#b-retake').onclick = retake;
+$('#b-retry-cam').onclick = startCamera;
+$('#f-upload').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const img = new Image();
+  img.onload = () => { shotData = cropToDataURL(img, img.naturalWidth, img.naturalHeight, false); URL.revokeObjectURL(img.src); $('#shot').src = shotData; setStage('shot'); validateEnter(); };
+  img.onerror = () => toast('Couldn\'t read that image.', true);
+  img.src = URL.createObjectURL(file);
+});
+
+function validateEnter() {
+  const hasPhoto = !!shotData, hasName = !!$('#f-name').value.trim();
+  $('#b-submit').disabled = !(hasPhoto && hasName);
+  $('#st-1').classList.toggle('done', hasPhoto);
+  $('#st-2').classList.toggle('done', hasName);
+  $('#st-3').classList.toggle('done', !!$('#f-blurb').value.trim());
+  $('#enter-hint').textContent = hasPhoto && hasName ? 'Looking good! Hit submit.' : !hasPhoto ? 'Take a photo first.' : 'Add your name to submit.';
+  $('#blurb-count').textContent = `${$('#f-blurb').value.length}/160`;
+}
+$('#f-name').addEventListener('input', validateEnter);
+$('#f-blurb').addEventListener('input', validateEnter);
+
+$('#enter-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = $('#f-name').value.trim().slice(0, 40);
+  if (!shotData || !name) return;
+  if (!settings.entriesOpen) return toast('Sorry — entries just closed!', true);
+  const num = entries.reduce((m, x) => Math.max(m, x.num), 0) + 1;
+  const entry = { id: uid(), num, name, blurb: $('#f-blurb').value.trim().slice(0, 160), photo: shotData, createdAt: Date.now() };
+  $('#b-submit').disabled = true;
+  try { await DB.put('entries', entry); }
+  catch (err) { $('#b-submit').disabled = false; return toast('Couldn\'t save the entry — grab the host.', true); }
+  entries.push(entry);
+  celebrate(`You're in, ${name}!`, `Costume #${num} is on the board. Good luck! 🍀`, () => {
+    show('gallery'); renderGallery(); flashCard(entry.id);
+  });
+});
+
+/* ---------- vote ---------- */
+let voter = null; const picks = new Set();
+function openVote() {
+  if (!entries.length) return toast('No costumes to vote on yet!');
+  if (!settings.votingOpen) return toast('Voting hasn\'t opened yet — the host will open it soon. 👻');
+  voter = null; picks.clear();
+  $('#v-name').value = ''; $('#v-err').textContent = ''; $('#v-k').textContent = votesAllowed();
+  $('#vote-step1').hidden = false; $('#vote-step2').hidden = true; $('#votebar').hidden = true;
+  show('vote'); setTimeout(() => $('#v-name').focus(), 60);
+}
+$('#voter-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#v-name').value.trim();
+  if (!name) { $('#v-err').textContent = 'Please enter your name.'; return; }
+  if (votes.some(v => norm(v.voter) === norm(name))) {
+    $('#v-err').textContent = `Looks like "${name}" already voted. If that's a mistake, grab the host.`; return;
+  }
+  voter = name; picks.clear();
+  $('#vote-step1').hidden = true; $('#vote-step2').hidden = false; $('#votebar').hidden = false;
+  $('#vb-name').textContent = name;
+  renderVoteGrid(); updateVoteBar();
+});
+function renderVoteGrid() {
+  $('#vote-grid').innerHTML = entries.map(e =>
+    cardHTML(e, { selectable: true, selected: picks.has(e.id), mine: norm(e.name) === norm(voter) })).join('');
+}
+$('#vote-grid').addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c) return;
+  const id = c.dataset.id, k = votesAllowed();
+  if (picks.has(id)) picks.delete(id);
+  else {
+    if (picks.size >= k) {
+      c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+      return toast(`You've used all ${k} votes — tap one of your picks to swap it out.`);
+    }
+    picks.add(id);
+  }
+  c.classList.toggle('selected', picks.has(id));
+  c.querySelector('.check').textContent = picks.has(id) ? '✓' : '';
+  updateVoteBar();
+});
+function updateVoteBar() {
+  const k = votesAllowed(), used = picks.size;
+  let dots = '';
+  for (let i = 0; i < k; i++) dots += `<span class="${i < used ? '' : 'off'}">🎃</span>`;
+  $('#vb-dots').innerHTML = dots + `<span class="lbl">${used} of ${k} votes used</span>`;
+  $('#b-vote-submit').disabled = used === 0;
+}
+$('#b-vote-cancel').onclick = () => { show('gallery'); renderGallery(); };
+$('#b-vote-submit').onclick = () => {
+  const chosen = entries.filter(e => picks.has(e.id));
+  $('#confirm-list').innerHTML = chosen.map(e => `<li><img src="${e.photo}" alt=""><div><b>#${e.num} ${esc(e.name)}</b></div></li>`).join('');
+  openModal('confirm-modal');
+};
+$('#b-cast').onclick = async () => {
+  if (!voter || !picks.size) return;
+  if (votes.some(v => norm(v.voter) === norm(voter))) { closeModal('confirm-modal'); return toast('This name has already voted.', true); }
+  const ballot = { id: uid(), voter, picks: [...picks], at: Date.now() };
+  try { await DB.put('votes', ballot); } catch (e) { return toast('Couldn\'t save your votes — grab the host.', true); }
+  votes.push(ballot); closeModal('confirm-modal');
+  celebrate('Votes cast!', `Thanks, ${voter}! Winners announced later tonight. 🦇`, () => { show('gallery'); renderGallery(); });
+};
+
+/* ---------- celebration overlay ---------- */
+let celDone = null, celT;
+function celebrate(title, sub, then) {
+  $('#cel-title').textContent = title; $('#cel-sub').textContent = sub;
+  $('#celebrate').hidden = false; boo($('#celebrate'), 24);
+  celDone = then; clearTimeout(celT); celT = setTimeout(finishCelebrate, 3500);
+}
+function finishCelebrate() {
+  clearTimeout(celT); $('#celebrate').hidden = true;
+  $$('#celebrate .boo').forEach(b => b.remove());
+  const f = celDone; celDone = null; if (f) f();
+}
+$('#celebrate').onclick = finishCelebrate;
+function boo(host, n) {
+  const icons = ['🎃', '👻', '🦇', '🍬', '🕷️', '🍭', '💀'];
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span'); s.className = 'boo';
+    s.textContent = icons[i % icons.length];
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+    s.style.animationDelay = (Math.random() * 1.5) + 's';
+    s.style.fontSize = (28 + Math.random() * 30) + 'px';
+    host.appendChild(s);
+  }
+}
+
+/* ---------- host ---------- */
+$('#b-host').onclick = () => { $('#pin-input').value = ''; $('#pin-err').textContent = ''; openModal('pin-modal'); setTimeout(() => $('#pin-input').focus(), 50); };
+$('#pin-form').addEventListener('submit', e => {
+  e.preventDefault();
+  if ($('#pin-input').value !== String(settings.pin)) { $('#pin-err').textContent = 'Wrong PIN.'; $('#pin-input').select(); return; }
+  closeModal('pin-modal'); renderHost(); openModal('host-modal');
+});
+function renderHost() {
+  const r = ranked(), k = votesAllowed(), max = Math.max(1, ...r.map(x => x.votes));
+  const placeLbl = p => p === 1 ? '🏆' : p === 2 ? '🥈' : p === 3 ? '🥉' : p;
+  $('#host-body').innerHTML = `
+    <h2 class="display">Host controls</h2>
+    <div class="host-sec" style="border:0;margin-top:0;padding-top:4px">
+      <h3>Contest</h3>
+      <div class="row">
+        <label class="toggle"><input type="checkbox" data-set="entriesOpen" ${settings.entriesOpen ? 'checked' : ''}><span class="sw"></span>Entries open</label>
+        <label class="toggle"><input type="checkbox" data-set="votingOpen" ${settings.votingOpen ? 'checked' : ''}><span class="sw"></span>Voting open</label>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <span>Votes per guest:</span>
+        <div class="seg">
+          ${[0, 3, 4, 5].map(v => `<button data-act="override" data-v="${v}" class="${settings.voteOverride === v ? 'on' : ''}">${v ? v : `Auto (${Math.min(autoVotes(entries.length), Math.max(1, entries.length - 1))})`}</button>`).join('')}
+        </div>
+        <span class="muted">→ currently <b style="color:var(--text)">${k}</b></span>
+      </div>
+      <p class="note">Auto = 3 votes for up to 8 costumes, 4 for 9–14, 5 for 15+. Tip: close entries before opening voting so every guest gets the same number of votes.</p>
+    </div>
+
+    <div class="host-sec">
+      <h3>Results — ${votes.length} ballot${votes.length === 1 ? '' : 's'} cast</h3>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn btn-primary" data-act="reveal" ${votes.length ? '' : 'disabled'}>🏆 Reveal winners</button>
+      </div>
+      ${r.length ? `<table class="res"><tr><th>Place</th><th></th><th>Costume</th><th>Votes</th><th style="width:30%"></th><th></th></tr>
+        ${r.map(x => `<tr>
+          <td class="place">${placeLbl(x.place)}</td>
+          <td><img src="${x.photo}" alt=""></td>
+          <td><b>#${x.num} ${esc(x.name)}</b><div class="muted" style="font-size:13px">${esc(x.blurb || '')}</div></td>
+          <td class="votes">${x.votes}</td>
+          <td><div class="bar" style="width:${(x.votes / max) * 100}%"></div></td>
+          <td><button class="btn btn-ghost btn-sm" data-act="del-entry" data-id="${x.id}">Delete</button></td>
+        </tr>`).join('')}</table>` : '<p class="muted">No entries yet.</p>'}
+    </div>
+
+    <div class="host-sec">
+      <h3>Who voted (${votes.length})</h3>
+      ${votes.length ? `<div class="row">${votes.slice().sort((a, b) => a.at - b.at).map(v =>
+        `<span class="toggle" style="cursor:default">${esc(v.voter)} <span class="muted">· ${v.picks.length}</span>
+         <button class="btn btn-ghost btn-sm" data-act="del-vote" data-id="${v.id}" title="Remove ballot so they can vote again">✕</button></span>`).join('')}</div>
+         <p class="note">Removing a ballot deletes those votes and lets that person vote again.</p>` : '<p class="muted">No ballots yet.</p>'}
+    </div>
+
+    <div class="host-sec">
+      <h3>Data &amp; settings</h3>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" data-act="export">⬇ Export backup</button>
+        <button class="btn btn-ghost btn-sm" data-act="import">⬆ Import backup</button>
+        <span class="spacer"></span>
+        <input class="mini-input" id="new-pin" type="password" inputmode="numeric" placeholder="New PIN">
+        <button class="btn btn-ghost btn-sm" data-act="pin">Change PIN</button>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-danger btn-sm" data-act="reset">Reset everything</button>
+        <span class="muted" style="font-size:14px">Deletes all entries and votes on this laptop. Export a backup first.</span>
+      </div>
+    </div>`;
+}
+$('#host-body').addEventListener('change', e => {
+  const t = e.target.closest('[data-set]'); if (!t) return;
+  settings[t.dataset.set] = t.checked; saveSettings(); updateHeader(); renderHost();
+  toast(`${t.dataset.set === 'entriesOpen' ? 'Entries' : 'Voting'} ${t.checked ? 'opened' : 'closed'}.`);
+});
+$('#host-body').addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'override') { settings.voteOverride = +b.dataset.v; saveSettings(); updateHeader(); renderHost(); }
+  else if (act === 'reveal') startReveal();
+  else if (act === 'del-entry') {
+    const en = entries.find(x => x.id === b.dataset.id);
+    if (!en || !confirm(`Delete costume #${en.num} (${en.name})? Votes for it will no longer count.`)) return;
+    await DB.del('entries', en.id); entries = entries.filter(x => x.id !== en.id);
+    renderHost(); renderGallery();
+  }
+  else if (act === 'del-vote') {
+    const v = votes.find(x => x.id === b.dataset.id);
+    if (!v || !confirm(`Remove ${v.voter}'s ballot? They'll be able to vote again.`)) return;
+    await DB.del('votes', v.id); votes = votes.filter(x => x.id !== v.id); renderHost();
+  }
+  else if (act === 'export') exportBackup();
+  else if (act === 'import') $('#import-file').click();
+  else if (act === 'pin') {
+    const p = $('#new-pin').value.trim();
+    if (p.length < 3) return toast('PIN must be at least 3 characters.', true);
+    settings.pin = p; saveSettings(); $('#new-pin').value = ''; toast('Host PIN updated.');
+  }
+  else if (act === 'reset') {
+    if (prompt('Type RESET to delete every entry and vote on this laptop.') !== 'RESET') return;
+    await DB.clear('entries'); await DB.clear('votes'); entries = []; votes = [];
+    settings.entriesOpen = true; settings.votingOpen = false; saveSettings();
+    renderHost(); renderGallery(); toast('Everything has been reset.');
+  }
+});
+function exportBackup() {
+  const data = { app: 'costume-contest', version: 1, exportedAt: new Date().toISOString(), entries, votes };
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const a = document.createElement('a');
+  const d = new Date(), pad = n => String(n).padStart(2, '0');
+  a.download = `costume-contest-backup-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
+  a.href = URL.createObjectURL(blob); document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+$('#import-file').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (data.app !== 'costume-contest' || !Array.isArray(data.entries) || !Array.isArray(data.votes)) throw new Error('bad file');
+    if (!confirm(`Replace everything on this laptop with the backup (${data.entries.length} entries, ${data.votes.length} ballots)?`)) return;
+    await DB.clear('entries'); await DB.clear('votes');
+    for (const x of data.entries) await DB.put('entries', x);
+    for (const x of data.votes) await DB.put('votes', x);
+    await load(); renderHost(); renderGallery(); toast('Backup restored.');
+  } catch (err) { toast('That doesn\'t look like a costume-contest backup.', true); }
+});
+
+/* ---------- winners reveal ---------- */
+let revealSteps = [], revealIdx = 0;
+function startReveal() {
+  const r = ranked().filter(x => x.votes > 0 && x.place <= 3);
+  if (!r.length) return toast('No votes yet!');
+  const places = [...new Set(r.map(x => x.place))].sort((a, b) => b - a);
+  revealSteps = [{ intro: true }, ...places.map(p => ({ place: p, items: r.filter(x => x.place === p) }))];
+  revealIdx = 0; closeAllModals(); $('#reveal').hidden = false; renderReveal();
+}
+function renderReveal() {
+  const s = revealSteps[revealIdx], host = $('#reveal');
+  $$('#reveal .boo').forEach(b => b.remove());
+  if (s.intro) {
+    $('#reveal-body').innerHTML = `<div style="font-size:90px">🦇</div><h1 class="display">And the winners are…</h1>
+      <div class="sub">${votes.length} ballots · ${entries.length} costumes</div>`;
+    return;
+  }
+  const lbl = { 1: '🏆 Best Costume', 2: '🥈 2nd Place', 3: '🥉 3rd Place' }[s.place];
+  $('#reveal-body').innerHTML = `<h1 class="display">${lbl}${s.items.length > 1 ? ' <span style="font-size:.5em">(tie!)</span>' : ''}</h1>
+    <div class="winners">${s.items.map((x, i) => `<div class="winner" style="animation-delay:${i * .15}s">
+      <img src="${x.photo}" alt=""><b>${esc(x.name)}</b><span>${x.votes} vote${x.votes === 1 ? '' : 's'}</span></div>`).join('')}</div>`;
+  if (s.place === 1) boo(host, 40);
+}
+function advanceReveal() {
+  if (revealIdx < revealSteps.length - 1) { revealIdx++; renderReveal(); } else endReveal();
+}
+function endReveal() { $('#reveal').hidden = true; $$('#reveal .boo').forEach(b => b.remove()); }
+$('#reveal').onclick = advanceReveal;
+
+/* ---------- header buttons & keys ---------- */
+$('#b-enter').onclick = openEnter;
+$('#b-enter-empty').onclick = openEnter;
+$('#b-vote').onclick = openVote;
+$('#b-back').onclick = () => { show('gallery'); renderGallery(); };
+$('#b-full').onclick = () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen?.().catch(() => {});
+};
+document.addEventListener('keydown', e => {
+  if (!$('#reveal').hidden) {
+    if (e.key === 'Escape') endReveal();
+    else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advanceReveal(); }
+    return;
+  }
+  if (!$('#celebrate').hidden) { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); finishCelebrate(); } return; }
+  if (e.key === 'Escape') { const open = $$('.modal-back.open'); if (open.length) open[open.length - 1].classList.remove('open'); return; }
+  // space bar takes the photo when not typing
+  if (current === 'enter' && e.key === ' ' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName) && !$('#b-snap').hidden) { e.preventDefault(); snap(); }
+});
+
+/* ---------- kiosk: idle reset + keep screen awake ---------- */
+let idleT;
+function resetIdle() {
+  clearTimeout(idleT);
+  if (current === 'enter' || current === 'vote') idleT = setTimeout(() => {
+    if ($('#host-modal').classList.contains('open') || $('#pin-modal').classList.contains('open')) return resetIdle();
+    closeAllModals(); show('gallery'); renderGallery(); toast('Timed out — back to the gallery 👻');
+  }, IDLE_MS);
+}
+['pointerdown', 'keydown', 'input'].forEach(ev => addEventListener(ev, resetIdle, { passive: true }));
+async function keepAwake() { try { await navigator.wakeLock?.request('screen'); } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
+
+/* ---------- boot ---------- */
+(async function init() {
+  await DB.open();
+  try { await navigator.storage?.persist?.(); } catch (e) {}
+  await load();
+  renderGallery(); show('gallery'); keepAwake();
+})();
+</script>
+</body>
+</html>
